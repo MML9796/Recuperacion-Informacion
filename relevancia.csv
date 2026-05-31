@@ -1,0 +1,143 @@
+necesidad_id,documento_id,titulo,relevante
+1,0,Avatar,1
+6,0,Avatar,1
+3,1,Pirates of the Caribbean: At World's End,1
+4,1,Pirates of the Caribbean: At World's End,1
+4,2,Spectre,1
+6,2,Spectre,1
+10,3,The Dark Knight Rises,1
+20,3,The Dark Knight Rises,1
+1,4,John Carter,1
+6,4,John Carter,1
+3,5,Spider-Man 3,1
+4,5,Spider-Man 3,1
+5,6,Tangled,1
+1,7,Avengers: Age of Ultron,1
+2,8,Harry Potter and the Half-Blood Prince,1
+4,8,Harry Potter and the Half-Blood Prince,1
+3,9,Batman v Superman: Dawn of Justice,1
+4,9,Batman v Superman: Dawn of Justice,1
+19,9,Batman v Superman: Dawn of Justice,1
+1,10,Superman Returns,1
+6,10,Superman Returns,1
+15,10,Superman Returns,1
+10,11,Quantum of Solace,1
+16,11,Quantum of Solace,1
+4,12,Pirates of the Caribbean: Dead Man's Chest,1
+6,12,Pirates of the Caribbean: Dead Man's Chest,1
+14,12,Pirates of the Caribbean: Dead Man's Chest,1
+4,13,The Lone Ranger,1
+20,13,The Lone Ranger,1
+1,14,Man of Steel,1
+6,14,Man of Steel,1
+13,14,Man of Steel,1
+17,14,Man of Steel,1
+2,15,The Chronicles of Narnia: Prince Caspian,1
+3,15,The Chronicles of Narnia: Prince Caspian,1
+4,15,The Chronicles of Narnia: Prince Caspian,1
+19,15,The Chronicles of Narnia: Prince Caspian,1
+1,16,The Avengers,1
+6,16,The Avengers,1
+15,16,The Avengers,1
+3,17,Pirates of the Caribbean: On Stranger Tides,1
+4,17,Pirates of the Caribbean: On Stranger Tides,1
+1,18,Men in Black 3,1
+6,18,Men in Black 3,1
+13,18,Men in Black 3,1
+3,19,The Hobbit: The Battle of the Five Armies,1
+4,19,The Hobbit: The Battle of the Five Armies,1
+4,20,The Amazing Spider-Man,1
+6,20,The Amazing Spider-Man,1
+4,21,Robin Hood,1
+4,22,The Hobbit: The Desolation of Smaug,1
+14,22,The Hobbit: The Desolation of Smaug,1
+3,23,The Golden Compass,1
+16,23,The Golden Compass,1
+4,24,King Kong,1
+6,24,King Kong,1
+9,25,Titanic,1
+1,26,Captain America: Civil War,1
+6,26,Captain America: Civil War,1
+15,26,Captain America: Civil War,1
+1,27,Battleship,1
+13,27,Battleship,1
+1,28,Jurassic World,1
+6,28,Jurassic World,1
+7,28,Jurassic World,1
+4,29,Skyfall,1
+18,29,Skyfall,1
+4,30,Spider-Man 2,1
+6,30,Spider-Man 2,1
+1,31,Iron Man 3,1
+2,32,Alice in Wonderland,1
+4,32,Alice in Wonderland,1
+11,32,Alice in Wonderland,1
+15,32,Alice in Wonderland,1
+1,33,X-Men: The Last Stand,1
+7,33,X-Men: The Last Stand,1
+5,34,Monsters University,1
+1,35,Transformers: Revenge of the Fallen,1
+1,36,Transformers: Age of Extinction,1
+6,36,Transformers: Age of Extinction,1
+17,36,Transformers: Age of Extinction,1
+2,37,Oz: The Great and Powerful,1
+3,37,Oz: The Great and Powerful,1
+4,37,Oz: The Great and Powerful,1
+4,38,The Amazing Spider-Man 2,1
+6,38,The Amazing Spider-Man 2,1
+1,39,TRON: Legacy,1
+5,40,Cars 2,1
+8,40,Cars 2,1
+1,41,Green Lantern,1
+7,41,Green Lantern,1
+5,42,Toy Story 3,1
+8,42,Toy Story 3,1
+1,43,Terminator Salvation,1
+6,44,Furious 7,1
+1,45,World War Z,1
+18,45,World War Z,1
+1,46,X-Men: Days of Future Past,1
+6,46,X-Men: Days of Future Past,1
+13,46,X-Men: Days of Future Past,1
+1,47,Star Trek Into Darkness,1
+16,47,Star Trek Into Darkness,1
+2,48,Jack the Giant Slayer,1
+6,48,Jack the Giant Slayer,1
+12,49,The Great Gatsby,1
+4,50,Prince of Persia: The Sands of Time,1
+6,50,Prince of Persia: The Sands of Time,1
+1,51,Pacific Rim,1
+16,51,Pacific Rim,1
+1,52,Transformers: Dark of the Moon,1
+6,52,Transformers: Dark of the Moon,1
+4,53,Indiana Jones and the Kingdom of the Crystal Skull,1
+4,54,The Good Dinosaur,1
+5,54,The Good Dinosaur,1
+2,55,Brave,1
+3,55,Brave,1
+4,55,Brave,1
+5,55,Brave,1
+8,55,Brave,1
+1,56,Star Trek Beyond,1
+6,56,Star Trek Beyond,1
+7,56,Star Trek Beyond,1
+6,58,Rush Hour 3,1
+10,58,Rush Hour 3,1
+1,59,2012,1
+1,61,Jupiter Ascending,1
+3,61,Jupiter Ascending,1
+4,62,The Legend of Tarzan,1
+6,62,The Legend of Tarzan,1
+2,63,"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",1
+3,63,"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",1
+4,63,"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",1
+19,63,"The Chronicles of Narnia: The Lion, the Witch and the Wardrobe",1
+1,64,X-Men: Apocalypse,1
+10,65,The Dark Knight,1
+4,66,Up,1
+8,66,Up,1
+1,67,Monsters vs Aliens,1
+5,67,Monsters vs Aliens,1
+1,68,Iron Man,1
+6,68,Iron Man,1
+16,69,Hugo,1

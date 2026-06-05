@@ -1,0 +1,21 @@
+necesidad_id,consulta_booleana,consulta_texto_libre
+1,ciencia AND ficción AND NOT romance,ciencia ficción no romance
+2,fantasía AND (familia OR animación),fantasía familiar animación
+3,inglés AND fantasía AND recomendada,inglés fantasía recomendada
+4,aventura AND NOT ciencia AND NOT ficción AND NOT predecible,aventura no ciencia ficcion no predecible
+5,animación AND familia AND NOT reflexión,animación familia no reflexiva
+6,acción AND español AND NOT predecible,acción español no predecible
+7,ciencia AND ficción AND aventura AND visualmente AND increíble,ciencia ficción aventura visualmente increíble
+8,comedia AND animación AND NOT decepción,comedia animación no decepcionante
+9,drama AND inglés AND actuaciones AND brillantes,drama inglés actuaciones brillantes
+10,suspense AND crimen AND NOT lenta,suspense crimen no lenta
+11,familia AND español AND obra AND maestra,familiar español obra maestra
+12,drama AND romance AND inglés AND joya AND oculta,drama romántico inglés joya oculta
+13,acción AND ciencia AND ficción AND decepción,acción ciencia ficción decepción
+14,aventura AND fantasía AND español AND joya AND oculta,aventura fantasía español joya oculta
+15,aventura AND español AND obra AND maestra,aventura español obra maestra
+16,aventura AND inglés AND entretenida AND predecible,aventura inglés entretenida predecible
+17,acción AND ciencia AND ficción AND español AND reflexión AND profunda,acción ciencia ficción español reflexión profunda
+18,suspense AND inglés AND fascinante AND bien AND estructurada,suspense inglés fascinante bien estructurada
+19,aventura AND fantasía AND inglés AND visualmente AND increíble AND guion AND flojea,aventura fantasía inglés visualmente increíble guion flojea
+20,acción AND inglés AND (drama OR western) AND joya AND oculta,acción inglés drama western joya oculta

@@ -213,32 +213,83 @@ todos los documentos, devolviendo un ranking continuo de relevancia.
 
 \section{Resultados}
 
-En esta sección se detallarán tanto los experimentos realizados como los
-resultados conseguidos:
+En esta sección se dejan asentados los experimentos llevados a cabo para evaluar el rendimiento de los dos sistemas de recuperación de información desarrollados: el modelo booleano (basado en la biblioteca Whoosh) y el modelo vectorial (basado en la ponderación TF-IDF y la similitud del coseno). Primero se describe el banco de datos utilizado para los experimentos, seguido del análisis de los resultados cuantitativos obtenidos por ambos enfoques, y se concluye con un análisis comparativo de sus fortalezas y limitaciones.
+
+\subsection{Diseño Experimental y Configuración}
+
+Para evaluar la efectividad de ambos motores de búsqueda, se confeccionó un banco de pruebas compuesto por:
 \begin{itemize}
-\item Los experimentos realizados, indicando razonadamente la configuración
-  empleada, qué se quiere determinar, y como se ha medido.
-\item Los resultados obtenidos en cada experimento, explicando en cada caso lo
-  que se ha conseguido.
-\item Análisis de los resultados, haciendo comparativas y obteniendo
-  conclusiones.
+    \item \textbf{Colección de Documentos (Corpus):} Un total de 70 películas con información estructurada que integra título, idioma, sinopsis, géneros y reseñas de usuarios. Tras el preprocesamiento (conversión a minúsculas, tokenización, eliminación de caracteres no alfanuméricos, eliminación de palabras vacías en español y reducción a raíces léxicas mediante Snowball), cada película se indexó como un único documento consolidado.
+    \item \textbf{Necesidades de Información (NI):} Se definieron manualmente 20 necesidades de información representativas de búsquedas reales de usuarios, abarcando desde filtros temáticos directos (género, idioma) hasta criterios más subjetivos extraídos de las críticas (como ``joya oculta'' u ``obra maestra'').
+    \item \textbf{Consultas Formuladas:} Para cada NI, se derivaron dos consultas específicas: una expresión booleana formal (utilizando operadores AND, OR, y NOT) y una consulta en texto libre para el motor vectorial.
+    \item \textbf{Juicios de Relevancia (Verdad de Referencia):} Las autoras evaluaron manualmente cada película frente a las 20 necesidades de información, estableciendo un conjunto binario de relevancia (1 para relevante, 0 para no relevante) para calcular las métricas.
 \end{itemize}
 
-Se pueden hacer uso de tablas, como el ejemplo de la tabla~\ref{tab:ejemplo}.
+Para el sistema booleano, al tratarse de un modelo no posicionado (que devuelve un conjunto desordenado de documentos), se utilizaron las métricas de \textbf{Precisión} y \textbf{Sensibilidad o Recall} promediadas sobre las 20 consultas. Para el sistema vectorial, dado que devuelve una lista ordenada de documentos según su similitud del coseno, se evaluó mediante la \textbf{Precisión Media (Average Precision, AP)} de cada consulta y el \textbf{Promedio de Precisión Media (Mean Average Precision, MAP)} global del sistema.
 
-\begin{table}
-  \caption{Ejemplo de tabla}
-  \label{tab:ejemplo}
+\subsection{Evaluación del Sistema Booleano}
+
+Los resultados promediados obtenidos por el motor booleano muestran una \textbf{Precisión Promedio de 0.9980} (99.8\%) y un \textbf{Recall Promedio de 1.0000} (100\%).
+
+Un desglose detallado de los resultados por consulta (véase la Tabla~\ref{tab:resultados_detallados}) revela que en 19 de las 20 necesidades de información el sistema booleano logró una precisión de 1.0 y un recall de 1.0. La única desviación se dio en la necesidad de información número 6 (\textit{``Que sea de acción en español y no sea predecible''}), donde la precisión disminuyó ligeramente a 0.96 debido a la presencia de un único falso positivo. Específicamente, la película \textit{The Hobbit: The Desolation of Smaug} fue recuperada por el motor booleano. Aunque esta obra no cuenta de forma explícita con el género de ``Acción'' en sus metadatos oficiales, en el texto de su sinopsis se describe como una película ``cargada de acción''. Dado que el sistema indexa y busca sobre el campo unificado de contenido, el término ``acción'' en la sinopsis cumplió con la condición lógica de la consulta, provocando que se clasificara en los resultados. El recall se mantuvo en 1.0 para la totalidad de las consultas.
+
+Estos números tan elevados están condicionados por el \textbf{sesgo de autoría} (\textit{author bias}). Puesto que las mismas personas diseñaron el corpus, las necesidades de información y las consultas booleanas, se produjo un acoplamiento cognitivo. Al redactar las consultas booleanas, las autoras emplearon términos exactos sabiendo de antemano el vocabulario indexado en los documentos relevantes. En un entorno real con usuarios externos, el rendimiento del modelo booleano disminuiría notablemente debido a problemas de sinonimia o polisemia.
+
+\subsection{Evaluación del Sistema Vectorial (TF-IDF y Coseno)}
+
+El sistema de espacio vectorial obtuvo un \textbf{Mean Average Precision (MAP) de 0.7248} (72.48\%) sobre las 20 necesidades de información, exhibiendo una variabilidad de rendimiento muy pronunciada entre las diferentes consultas.
+
+En la Tabla~\ref{tab:resultados_detallados} se observa que las consultas 7, 8, 9, 12, 18 y 20 alcanzaron una Precisión Media perfecta ($AP = 1.0000$). Esto se debe a que contienen términos muy específicos y poco frecuentes en el corpus (con un alto valor de frecuencia inversa de documento o IDF), como \textit{``brillantes''}, \textit{``decepción''}, \textit{``maestra''}, o \textit{``western''}. Al introducir estos términos discriminatorios, el modelo vectorial pondera fuertemente esas dimensiones, situando los documentos relevantes al inicio del ranking.
+
+Por el contrario, los peores resultados se registraron en las siguientes necesidades de información:
+\begin{itemize}
+    \item \textbf{Necesidad 19 ($AP = 0.2685$):} \textit{``Que sea de aventura y fantasía en inglés, y sea visualmente increíble con guion que flojea''}. Al ser una consulta larga con términos muy comunes (\textit{``aventura''}, \textit{``fantasía''}, \textit{``inglés''}), los términos específicos determinantes de la relevancia (como \textit{``flojea''}) ven diluida su influencia en el cálculo de la similitud del coseno, permitiendo que películas no deseadas superen a las deseadas en el ranking.
+    \item \textbf{Necesidad 4 ($AP = 0.2766$):} \textit{``Que no sea ciencia ficción y sea de aventura, y no sea predecible''}. La consulta fue \textit{``aventura no ciencia ficcion no predecible''}. Aquí se hace patente la incapacidad del modelo vectorial basado en bolsas de palabras para procesar negaciones lógicas. La palabra ``no'' suele filtrarse como stop word, por lo que el sistema evalúa la consulta como si el usuario buscara documentos relacionados con \textit{``ciencia''}, \textit{``ficción''} y \textit{``predecible''}, devolviendo resultados opuestos a la necesidad real.
+    \item \textbf{Necesidad 2 ($AP = 0.4289$):} \textit{``Que sea de fantasía y apta para todos los públicos''}. Al no contar con términos raros de alta selectividad, la similitud del coseno se vio afectada por el solapamiento de vocabulario común entre películas que no necesariamente cumplían con el criterio de relevancia familiar en sentido estricto.
+\end{itemize}
+
+\subsection{Análisis Comparativo y Discusión}
+
+Al comparar ambos enfoques, se evidencian las ventajas y desventajas de cada paradigma:
+\begin{enumerate}
+    \item \textbf{Gradación vs. Todo o Nada:} El modelo booleano no proporciona ningún ordenamiento de relevancia, clasifica el corpus de forma binaria. El modelo vectorial puntúa cada documento en una escala continua $[0, 1]$, permitiendo presentar al usuario un ranking ordenado de mayor a menor relevancia estimada, clave en colecciones grandes.
+    \item \textbf{Expresividad y Usabilidad:} Las consultas booleanas requieren un esfuerzo cognitivo elevado y conocimientos de lógica por parte del usuario. El modelo vectorial acepta texto libre y tolera correspondencias parciales de forma flexible.
+    \item \textbf{Manejo de la Negación:} El modelo booleano maneja con precisión la exclusión de términos mediante el operador \texttt{NOT}. En cambio, el modelo vectorial básico basado en similitud de coseno no distingue negaciones, lo que penaliza su desempeño en consultas con exclusiones explícitas.
+\end{enumerate}
+
+\begin{table*}[t]
+  \caption{Resultados detallados por necesidad de información (NI) para ambos sistemas}
+  \label{tab:resultados_detallados}
   \centering
-  \begin{tabular}{ccc}
+  \begin{tabular}{clccc}
     \toprule
-    A & B & C \\
+    \textbf{NI} & \textbf{Descripción resumida de la Necesidad de Información} & \textbf{Precisión Booleana} & \textbf{Recall Booleano} & \textbf{AP Vectorial (Coseno)} \\
     \midrule
-    1 & 2 & 3 \\
-    4 & 5 & 6 \\
+    1  & Ciencia ficción, no romántica & 1.00 & 1.00 & 0.7649 \\
+    2  & Fantasía, familiar o animación & 1.00 & 1.00 & 0.4289 \\
+    3  & Inglés, fantasía, recomendada & 1.00 & 1.00 & 0.8752 \\
+    4  & Aventura, no ciencia ficción, no predecible & 1.00 & 1.00 & 0.2766 \\
+    5  & Animación familiar, no reflexiva & 1.00 & 1.00 & 0.6679 \\
+    6  & Acción en español, no predecible & 0.96 & 1.00 & 0.6075 \\
+    7  & Ciencia ficción, aventura, visualmente increíble & 1.00 & 1.00 & 1.0000 \\
+    8  & Comedia de animación, no decepcionante & 1.00 & 1.00 & 1.0000 \\
+    9  & Drama en inglés, actuaciones brillantes & 1.00 & 1.00 & 1.0000 \\
+    10 & Suspense y crimen, no lenta & 1.00 & 1.00 & 0.5429 \\
+    11 & Familiar en español, obra maestra & 1.00 & 1.00 & 0.5000 \\
+    12 & Drama romántico en inglés, joya oculta & 1.00 & 1.00 & 1.0000 \\
+    13 & Acción, ciencia ficción, decepción & 1.00 & 1.00 & 0.9500 \\
+    14 & Aventura, fantasía en español, joya oculta & 1.00 & 1.00 & 0.5000 \\
+    15 & Aventura en español, obra maestra & 1.00 & 1.00 & 0.8542 \\
+    16 & Aventura en inglés, entretenida y predecible & 1.00 & 1.00 & 0.8100 \\
+    17 & Acción, ciencia ficción en español, reflexión profunda & 1.00 & 1.00 & 0.4500 \\
+    18 & Suspense en inglés, fascinante, bien estructurada & 1.00 & 1.00 & 1.0000 \\
+    19 & Aventura, fantasía en inglés, visualmente increíble, guion flojo & 1.00 & 1.00 & 0.2685 \\
+    20 & Acción en inglés, drama/western, joya oculta & 1.00 & 1.00 & 1.0000 \\
+    \midrule
+    \multicolumn{2}{r}{\textbf{Promedio Global (Métricas del Sistema)}} & \textbf{0.9980} & \textbf{1.0000} & \textbf{0.7248 (MAP)} \\
     \bottomrule
   \end{tabular}
-\end{table}
+\end{table*}
 
 
 \section{Conclusiones}

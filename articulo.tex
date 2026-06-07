@@ -104,17 +104,7 @@ desarrollado históricamente diversos modelos matemáticos de recuperación, los
 cuales varían en complejidad y enfoque lógico, abarcando desde las coincidencias 
 lógicas exactas hasta los sistemas basados en espacios vectoriales.
 
-En el ámbito del entretenimiento y el cine, la correcta interpretación de las consultas 
-de los usuarios resulta crítica para garantizar una buena experiencia de uso. Sin 
-embargo, las colecciones de documentos que describen este contenido suelen adolecer 
-de ruido conceptual y variaciones lingüísticas. Para mitigar esta problemática, la 
-aplicación de técnicas de preprocesamiento de lenguaje natural (PLN), tales como 
-la tokenización, la eliminación de palabras vacías (stop words) y la reducción de 
-términos a sus raíces morfológicas (stemming), resulta indispensable para 
-homogeneizar los textos antes de su indexación~\cite{b3}. Una vez estructurado el 
-corpus, surge el desafío de evaluar la eficacia de los motores de búsqueda mediante 
-métricas estandarizadas como la precisión, la exhaustividad (recall) y el 
-promedio de precisión media (Mean Average Precision o MAP).
+El lenguaje utilizado en las reseñas de películas y sinopsis suele ser muy libre, lo que introduce variaciones lingüísticas que afectan a la recuperación de información. Para unificar el texto antes de generar el índice, se aplica una etapa de preprocesamiento de lenguaje natural (PLN) basada en tokenización, eliminación de palabras vacías (\textit{stop words}) y reducción morfológica (\textit{stemming})~\cite{b3}. Con el corpus ya estructurado, el comportamiento de los motores de búsqueda se valida empleando las métricas habituales del sector: precisión, \textit{recall} y el promedio de precisión media (MAP).
 
 El objetivo principal de este trabajo es el diseño, la implementación y la evaluación 
 comparativa de dos aproximaciones clásicas en la recuperación de información. El 
@@ -177,38 +167,28 @@ Esta parte es la correspondiente a lo realmente desarrollado en el trabajo, y
 se puede emplear pseudocódigo (nunca código), esquemas, tablas, etc.
 
 \subsection{Construcción del Corpus Documental}
-Para satisfacer los objetivos específicos de este trabajo, se ha desarrollado un 
-corpus documental propio. Dicha colección ha sido confeccionada a partir de la 
-integración y limpieza de dos conjuntos de datos públicos e 
-independientes extraídos de la plataforma Kaggle. En primer lugar, se utilizó el
-\textit{TMDB 5000 Movie Dataset}~\cite{b4} para extraer los metadatos 
-estructurales de las obras cinematográficas, tales como el título, género, idioma 
-y la sinopsis oficial. En segundo lugar, se integró el \textit{IMDB Dataset}~\cite{b5} 
-para dotar al corpus de una dimensión de texto subjetivo mediante reseñas de 
-usuarios. La fusión y limpieza de ambas fuentes ha permitido construir 
-un entorno de pruebas textual enriquecido, realista y coherente para la evaluación 
-de los sistemas propuestos.
+Para satisfacer los objetivos del trabajo, se ha desarrollado un corpus documental propio. Dicha colección ha sido confeccionada a partir de la integración y limpieza de dos conjuntos de datos públicos e independientes extraídos de la plataforma Kaggle. En primer lugar, se utilizó el \textit{TMDB 5000 Movie Dataset}~\cite{b4} para extraer los metadatos estructurales de las películas, tales como el título, género, idioma y la sinopsis oficial. En segundo lugar, se integró el \textit{IMDB Dataset}~\cite{b5} para añadir al corpus texto subjetivo mediante reseñas de usuarios.
+
+Dada la cantidad de los registros en los repositorios originales, la construcción del archivo estructurado final (CSV) requirió un proceso de selección manual. Se extrajo un subconjunto más reducido y representativo de películas, lo cual garantizó un entorno de datos manejable y ajustado al alcance de la evaluación. Asimismo, durante esta fase de unificación, se identificó la necesidad de adaptar gran parte de la información al idioma principal del proyecto (español). Para solventarlo, se empleó el modelo de lenguaje Gemini, desarrollado por Google~\cite{b6}, el cual sirvió como herramienta de asistencia para la traducción de los textos y la posterior unificación de los datos en el archivo CSV final.
 
 \subsection{Preprocesamiento de Lenguaje Natural}
-Dado que el texto extraído presenta una alta variabilidad lingüística, se aplicó 
-una canalización de normalización utilizando la librería NLTK. Primero, se realizó 
-la tokenización y transformación a minúsculas. Posteriormente, se eliminaron los 
-caracteres no alfanuméricos y las palabras vacías empleando diccionarios 
-estandarizados. Finalmente, se aplicó el algoritmo \textit{SnowballStemmer} para 
-agrupar palabras con raíces morfológicas comunes.
+Con el fin de optimizar el rendimiento de los motores de búsqueda, el corpus textual se sometió a una fase de preprocesamiento de lenguaje natural (PLN). Esto era necesario pues al tratarse de un conjunto de películas diversas con reseñas escritas por múltiples usuarios, la variabilidad lingüística era muy alta, lo que dificultaría a los modelos de recuperación y perjudicaría la coincidencia de términos.
 
-\subsection{Indexación y Modelos de Recuperación}
-Una vez normalizado el texto, los datos se estructuraron combinando los campos 
-en un documento indexable. Para la implementación técnica, el sistema se dividió 
+La limpieza se estructuró en varias etapas consecutivas utilizando la librería \textit{NLTK}. En primer lugar, el texto se convirtió a minúsculas y se aplicó una tokenización para fragmentar las cadenas en palabras individuales. Posteriormente, mediante expresiones regulares, se eliminaron los caracteres no alfanuméricos y los signos de puntuación. Para reducir el tamaño del vocabulario y evitar términos irrelevantes, se filtraron las palabras vacías (\textit{stop words}) empleando el diccionario en español de la librería. Finalmente, se aplicó el algoritmo \textit{SnowballStemmer} para reducir las palabras restantes a su raíz morfológica común. De este modo, se garantiza que términos con la misma base semántica se agrupen bajo un único identificador durante la indexación y la vectorización. 
+
+\subsection{Indexación}
+
+Una vez normalizado el texto, los datos se estructuraron combinando los campos en un documento indexable. Para ello, hicimos uso de la biblioteca \textit{Whoosh}, la cual nos permitió generar un índice invertido persistente en disco de forma eficaz. 
+
+El proceso de construcción del índice se dividió en dos fases principales. En primer lugar, se definió un esquema lógico (\textit{Schema}) para modelar la estructura de cada película. A cada película se le asignó un identificador único (\texttt{ID}) y varios campos de texto (\texttt{TEXT}) para almacenar sus metadatos (título, idioma, sinopsis, reseña y género). Todos estos atributos se configuraron con el parámetro \texttt{stored=True}, lo cual es fundamental para que el sistema no solo busque, sino que pueda recuperar y mostrar esa información al usuario en la interfaz final. Adicionalmente, se introdujo un campo clave denominado \texttt{contenido}, destinado a agrupar la versión preprocesada de los textos y sobre el cual se realizan las búsquedas globales.
+
+En la segunda fase, se configuró un directorio local (\texttt{indexdir}) donde el sistema aloja físicamente el índice invertido. Mediante la apertura de un escritor (\textit{IndexWriter}), se iteró sobre la estructura de datos que contenía el corpus (\textit{DataFrame}), añadiendo secuencialmente cada película como un nuevo documento. Finalmente, se consolidaron los cambios en memoria mediante una operación de \textit{commit}, dejando el índice cerrado,  listo para ser utilizado por los motores de búsqueda.
+\subsection{Modelos de Recuperación}
+Para la implementación técnica, el sistema se dividió 
 en dos motores:
 \begin{enumerate}
-    \item \textbf{Motor Booleano:} Construido sobre la biblioteca \textit{Whoosh}, 
-el cual genera un índice invertido en disco y evalúa consultas con operadores 
-lógicos exactos (AND, OR, NOT).
-    \item \textbf{Motor de Espacio Vectorial:} Apoyado en \textit{scikit-learn}, 
-transforma el texto en una matriz de características TF-IDF. Ante una consulta 
-en texto libre, la vectoriza y calcula la similitud del coseno respecto a 
-todos los documentos, devolviendo un ranking continuo de relevancia.
+   \item \textbf{Motor Booleano:} Este sistema evalúa consultas estructuradas por el usuario mediante operadores lógicos (\textit{AND}, \textit{OR} y \textit{NOT}) sobre el índice invertido generado previamente, recuperando únicamente las películas que cumplen de forma estricta con dichas restricciones. El motor está construido con el soporte de la biblioteca \textit{Whoosh}, haciendo uso de su analizador sintáctico (\textit{QueryParser}). Esta herramienta permite interpretar la consulta de manera robusta, gestionando correctamente la jerarquía de los paréntesis y aislando los espacios en blanco para evitar errores de sintaxis. Asimismo, el sistema separa los operadores lógicos y aplica de forma automática la misma canalización de preprocesamiento (conversión a minúsculas, filtrado y \textit{stemming}) a los términos de búsqueda individuales, garantizando así una coincidencia exacta con el vocabulario ya indexado.
+   \item \textbf{Motor de Espacio Vectorial:} Este modelo está implementado con la ayuda de \textit{scikit-learn} y funciona siguiendo unos pasos muy directos. Cuando el usuario introduce una consulta, lo primero que hace el sistema es procesar y limpiar ese texto. Después, utiliza la herramienta \textit{TfidfVectorizer} para transformar tanto los textos de las películas como la consulta en vectores. Una vez que tenemos la información convertida a pesos TF-IDF, calculamos la similitud del coseno entre la búsqueda y cada película del corpus. Esto nos devuelve una lista de puntuaciones que ordenamos de mayor a menor para que los resultados más relevantes aparezcan primero. Por último, el código aplica un filtro muy sencillo: solo guarda y devuelve los identificadores de aquellas películas cuya similitud sea estrictamente mayor a 0.00. 
 \end{enumerate}
 
 \section{Resultados}
@@ -292,6 +272,9 @@ Al comparar ambos enfoques, se evidencian las ventajas y desventajas de cada par
 \end{table*}
 
 
+
+
+
 \section{Conclusiones}
 
 Finalmente, se dedica la última sección para indicar las conclusiones obtenidas
@@ -307,6 +290,7 @@ trabajo futuro.
 \bibitem{b3} S. Bird, E. Klein, y E. Loper, \emph{Natural Language Processing with Python}. Sebastopol, CA, EE. UU.: O'Reilly Media, 2009.
 \bibitem{b4} The Movie Database (TMDB), ``TMDB 5000 Movie Dataset,'' Kaggle, 2017. [En línea]. Disponible en: https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
 \bibitem{b5} V. D. Pham, ``IMDB Dataset,'' Kaggle, 2019. [En línea]. Disponible en: https://www.kaggle.com/code/phamvudung/imdb-dataset
+\bibitem{b6} Google, ``Gemini'' (Modelo de lenguaje a gran escala), 2026. [En línea]. Disponible en: https://gemini.google.com
 \end{thebibliography}
 
 

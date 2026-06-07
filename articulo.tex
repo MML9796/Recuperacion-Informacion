@@ -179,13 +179,18 @@ La evaluación de sistemas de recuperación de información tiene una trayectori
 
 Cuando nos centramos en el idioma español, diversos estudios señalan que las búsquedas literales se quedan cortas debido a la rica flexión morfológica del lenguaje. En este escenario, la literatura demuestra que aplicar algoritmos de extracción de raíces, como el \textit{Snowball stemmer}, es una solución clave para agrupar variantes de una misma palabra y mejorar drásticamente la exhaustividad o \textit{recall} del sistema.
 
-Por otro lado, el uso de bases de datos de cine extraídas de Kaggle, como \textit{TMDB} e \textit{IMDB}~\cite{b4,b5}, es un recurso super explotado en nuestro campo. Sin embargo, casi todos los trabajos previos utilizan estos datasets para entrenar sistemas de recomendación (como filtrado colaborativo) o para predecir valoraciones. Lo que diferencia a nuestro proyecto es que cambiamos ese enfoque por completo: tomamos estos datos públicos de Kaggle para centrarnos estrictamente en la recuperación de texto. Esto nos ha permitido diseñar un banco de consultas propio y desafiante, adaptando las metodologías clásicas de evaluación a un vocabulario y un contexto de usuario totalmente actuales.
+Por otro lado, el uso de bases de datos de cine extraídas de Kaggle, como \textit{TMDB} e \textit{IMDB}~\cite{b4,b5}, es un recurso super explotado en nuestro campo. Sin embargo, casi todos los trabajos previos utilizan estos datasets para entrenar sistemas de recomendación (como filtrado colaborativo) o para predecir valoraciones. Lo que diferencia a nuestro proyecto es que cambiamos ese enfoque por completo: tomamos estos datos públicos de Kaggle para centrarnos estrictamente en la recuperación de texto. Esto nos ha permitido diseñar un banco de consultas, adaptando las metodologías clásicas de evaluación a un vocabulario y un contexto de usuario totalmente actuales.
 
 \section{Metodología}
 
-Esta sección se dedica a la descripción del método implementado en el trabajo.
-Esta parte es la correspondiente a lo realmente desarrollado en el trabajo, y
-se puede emplear pseudocódigo (nunca código), esquemas, tablas, etc.
+En esta sección se detalla el proceso técnico y metodológico llevado a cabo para 
+el diseño, desarrollo y evaluación de los sistemas de recuperación de información. 
+El flujo de trabajo descrito se divide en cinco etapas fundamentales: la 
+construcción de un corpus documental a medida, el establecimiento de un marco 
+de pruebas basado en necesidades de información reales, la aplicación de técnicas 
+de preprocesamiento de lenguaje natural para normalizar los textos, la indexación 
+de los datos estructurados y, por último, la implementación algorítmica de los 
+modelos de recuperación booleano y vectorial.
 
 \subsection{Construcción del Corpus Documental}
 Para satisfacer los objetivos del trabajo, se ha desarrollado un corpus documental propio. Dicha colección ha sido confeccionada a partir de la integración y limpieza de dos conjuntos de datos públicos e independientes extraídos de la plataforma Kaggle. En primer lugar, se utilizó el \textit{TMDB 5000 Movie Dataset}~\cite{b4} para extraer los metadatos estructurales de las películas, tales como el título, género, idioma y la sinopsis oficial. En segundo lugar, se integró el \textit{IMDB Dataset}~\cite{b5} para añadir al corpus texto subjetivo mediante reseñas de usuarios.

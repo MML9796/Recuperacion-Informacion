@@ -121,13 +121,13 @@ comparativa de dos aproximaciones clásicas en la recuperación de información.
 primer sistema propuesto se fundamenta en el modelo de recuperación Booleano, 
 implementado mediante la biblioteca Whoosh, el cual opera bajo una lógica de 
 correspondencia estricta. El segundo sistema consiste en un motor de consultas en 
-texto libre basado en el modelo de espacio vectorial, utilizando la ponderación TF-IDF 
-y el cálculo de la similitud del coseno para establecer un ranking ordenado de 
-relevancia. Ambos enfoques son validados empleando un corpus propio de sinopsis y 
-reseñas cinematográficas, confeccionado junto con un banco de veinte necesidades de 
-información y sus respectivos juicios de relevancia. A través de este escenario, se 
-persigue analizar las limitaciones prácticas de ambos modelos, prestando especial 
-atención a fenómenos como el sobreajuste y el sesgo de autoría en la evaluación.
+texto libre utilizando la ponderación TF-IDF y el cálculo de la similitud del coseno 
+para establecer un ranking ordenado de relevancia. Ambos enfoques son validados 
+empleando un corpus propio de sinopsis y reseñas cinematográficas, confeccionado 
+junto con un banco de veinte necesidades de información y sus respectivos juicios de 
+relevancia. A través de este escenario, se persigue analizar las limitaciones 
+prácticas de ambos modelos, prestando especial atención a fenómenos como el 
+sobreajuste y el sesgo de autoría en la evaluación.
 
 El resto de este documento se estructura de la siguiente manera: la Sección II 
 detalla las características del corpus cinematográfico y los procesos de 
@@ -147,28 +147,28 @@ también trabajos relacionados, si los hay.
 
 \subsection{Métodos empleados}
 
-Describir aquí los métodos y técnicas empleadas (búsqueda en espacio de
-estados, algoritmos genéticos, redes bayesianas, técnicas de clasificación,
-redes neuronales, etc.). Si es necesario, separarlos en distintas subsecciones
-dentro de Antecedentes.
-
-Se pueden usar listas por puntos como sigue:
+Para el tratamiento del lenguaje y la recuperación de información, este trabajo 
+se apoya en los siguientes conceptos teóricos:
 \begin{itemize}
-\item Un punto: esto es un ejemplo de una lista.
-\item Otro punto.
+    \item \textbf{Procesamiento de Lenguaje Natural (PLN):} Se utilizan técnicas
+     de normalización léxica, destacando la eliminación de palabras vacías
+      (\textit{stop words}) y la reducción morfológica o \textit{stemming}~\cite{b3}.
+    \item \textbf{Modelo Booleano:} Paradigma de recuperación de coincidencia 
+    exacta basado en la teoría de conjuntos y el álgebra de Boole.
+    \item \textbf{Modelo Vectorial (TF-IDF):} Enfoque que representa los 
+    documentos y consultas como vectores en un espacio multidimensional, 
+    ponderando los términos según su frecuencia local y rareza global. La 
+    similitud se evalúa mediante el cálculo del coseno del ángulo que forman 
+    dichos vectores~\cite{b1}.
 \end{itemize}
-
-Por último, se debe hacer un uso correcto de las referencias bibliográficas,
-para que el lector pueda acceder a más información~\cite{b2}. Todas las
-referencias al final del documento deben ser citadas al menos una vez.
-
 
 \subsection{Trabajo Relacionado}
 
-Se puede realizar un recorrido en la literatura sobre trabajos anteriores que
-estén relacionados y que sea por tanto interesante comentar aquí. Por supuesto,
-añadir las referencias bibliográficas correspondientes.
-
+En el ámbito de la recuperación de información, es habitual evaluar los 
+sistemas utilizando colecciones de prueba estandarizadas y de dominio público 
+(como los corpus clásicos de Cranfield o TREC). Para 
+abordar el dominio cinematográfico con un vocabulario más actual, en este 
+proyecto se ha optado por construir un entorno de pruebas a medida.
 
 \section{Metodología}
 
@@ -176,86 +176,40 @@ Esta sección se dedica a la descripción del método implementado en el trabajo
 Esta parte es la correspondiente a lo realmente desarrollado en el trabajo, y
 se puede emplear pseudocódigo (nunca código), esquemas, tablas, etc.
 
-\begin{figure}
-  \centering
-  \includegraphics{ejemplo}
-  \caption{Ejemplo de un pie de figura. Imagen con derechos Creative Commons}
-  \label{fig:ejemplo}
-\end{figure}
+\subsection{Construcción del Corpus Documental}
+Para satisfacer los objetivos específicos de este trabajo, se ha desarrollado un 
+corpus documental propio. Dicha colección ha sido confeccionada a partir de la 
+integración y limpieza de dos conjuntos de datos públicos e 
+independientes extraídos de la plataforma Kaggle. En primer lugar, se utilizó el
+\textit{TMDB 5000 Movie Dataset}~\cite{b4} para extraer los metadatos 
+estructurales de las obras cinematográficas, tales como el título, género, idioma 
+y la sinopsis oficial. En segundo lugar, se integró el \textit{IMDB Dataset}~\cite{b5} 
+para dotar al corpus de una dimensión de texto subjetivo mediante reseñas de 
+usuarios. La fusión y limpieza de ambas fuentes ha permitido construir 
+un entorno de pruebas textual enriquecido, realista y coherente para la evaluación 
+de los sistemas propuestos.
 
-A continuación, un ejemplo de uso de listas numeradas:
+\subsection{Preprocesamiento de Lenguaje Natural}
+Dado que el texto extraído presenta una alta variabilidad lingüística, se aplicó 
+una canalización de normalización utilizando la librería NLTK. Primero, se realizó 
+la tokenización y transformación a minúsculas. Posteriormente, se eliminaron los 
+caracteres no alfanuméricos y las palabras vacías empleando diccionarios 
+estandarizados. Finalmente, se aplicó el algoritmo \textit{SnowballStemmer} para 
+agrupar palabras con raíces morfológicas comunes.
+
+\subsection{Indexación y Modelos de Recuperación}
+Una vez normalizado el texto, los datos se estructuraron combinando los campos 
+en un documento indexable. Para la implementación técnica, el sistema se dividió 
+en dos motores:
 \begin{enumerate}
-\item\label{item:dos-alumnos} \textit{Trabajos con dos alumnos:} poner nombre y
-  apellidos completos de cada uno, y correos electrónicos de contacto (a ser
-  posible de la Universidad de Sevilla). El orden de los alumnos se fijará por
-  orden alfabético según los apellidos.
-\item \textit{Trabajo con un autor:} cambiar la cabecera de la siguiente manera
-  \begin{enumerate}
-  \item \textit{Una sola columna:} solo se debe especificar un alumno.
-  \item \textit{Información a añadir:} la misma que la especificada en el
-    punto~\ref{item:dos-alumnos}.
-  \end{enumerate}
+    \item \textbf{Motor Booleano:} Construido sobre la biblioteca \textit{Whoosh}, 
+el cual genera un índice invertido en disco y evalúa consultas con operadores 
+lógicos exactos (AND, OR, NOT).
+    \item \textbf{Motor de Espacio Vectorial:} Apoyado en \textit{scikit-learn}, 
+transforma el texto en una matriz de características TF-IDF. Ante una consulta 
+en texto libre, la vectoriza y calcula la similitud del coseno respecto a 
+todos los documentos, devolviendo un ranking continuo de relevancia.
 \end{enumerate}
-
-Las figuras se deben mencionar en el texto, como la
-\figurename~\ref{fig:ejemplo}. También se pueden añadir ecuaciones, como la
-ecuación~\eqref{eq:ejemplo}.
-
-\begin{equation}
-  \label{eq:ejemplo}
-  a + b = \gamma
-\end{equation}
-
-Un ejemplo de pseudocódigo se puede observar en la
-\figurename~\ref{pcd:mergesort}.
-
-\begin{figure}
-  \begin{pseudo}*
-    \hd{\fn{mergesort}}(V) \\*
-    \multicolumn{2}{l}{\textbf{Entrada}: un vector \( V \)} \\*
-    \multicolumn{2}{l}{\textbf{Salida}: un vector con los elementos de \( V \)
-      en orden} \\
-    si \( V \) \textnormal{es unitario} entonces \\+
-    devolver \( V \) \\-
-    si no entonces \\+
-    \( V_{1} \leftarrow \textnormal{primera mitad de } V\) \\
-    \( V_{2} \leftarrow \textnormal{segunda mitad de } V\) \\
-    \( V_{1} \leftarrow \pr{mergesort}(V_{1}) \) \\
-    \( V_{2} \leftarrow \pr{mergesort}(V_{2}) \) \\
-    devolver \fn{mezcla}(V_{1}, V_{2})
-  \end{pseudo}
-  
-  \begin{pseudo}*
-    \hd{\fn{mezcla}}(V_{1}, V_{2}) \\*
-    \multicolumn{2}{l}{%
-      \textbf{Entrada}: dos vectores \( V_{1} \) y \( V_{2} \) ordenados
-    } \\*
-    \multicolumn{2}{l}{%
-      \textbf{Salida}: un vector con los elementos de \( V_{1} \) y \( V_{2} \)
-      en orden
-    } \\
-    si \( V_{1} \) \textnormal{no tiene elementos} entonces \\+
-    devolver \( V_{2} \) \\-
-    si no si \( V_{2} \) \textnormal{no tiene elementos} entonces \\+
-    devolver \( V_{1} \) \\-
-    si no entonces \\+
-    \( x_{1} \leftarrow \textnormal{primer elemento de } V_{1} \) \\
-    \( x_{2} \leftarrow \textnormal{primer elemento de } V_{2} \) \\
-    si \( x_{1} \leq x_{2} \) entonces \\+
-    \( x \leftarrow x_{1} \) \\
-    \textnormal{quitar el primer elemento de} \( V_{1} \) \\-
-    si no entonces \\+
-    \( x \leftarrow x_{2} \) \\
-    \textnormal{quitar el primer elemento de} \( V_{2} \) \\-
-    \( V \leftarrow \fn{mezcla}(V_{1}, V_{2}) \) \\
-    \textnormal{añadir} \( x \)
-    \textnormal{como primer elemento de} \( V \) \\
-    devolver \( V \)
-  \end{pseudo}
-  \caption{Algoritmo de ordenación \texttt{MergeSort}}
-  \label{pcd:mergesort}
-\end{figure}
-
 
 \section{Resultados}
 
@@ -300,6 +254,8 @@ trabajo futuro.
 \bibitem{b1} C. D. Manning, P. Raghavan, y H. Schütze, \emph{Introduction to Information Retrieval}. Cambridge, Reino Unido: Cambridge University Press, 2008.
 \bibitem{b2} Á. Romero Jiménez, ``Propuesta de trabajo práctico de la asignatura Inteligencia Artificial: Recuperación de la información,'' Dpto. de Ciencias de la Computación e Inteligencia Artificial, Universidad de Sevilla, Curso 2025/2026.
 \bibitem{b3} S. Bird, E. Klein, y E. Loper, \emph{Natural Language Processing with Python}. Sebastopol, CA, EE. UU.: O'Reilly Media, 2009.
+\bibitem{b4} The Movie Database (TMDB), ``TMDB 5000 Movie Dataset,'' Kaggle, 2017. [En línea]. Disponible en: https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
+\bibitem{b5} V. D. Pham, ``IMDB Dataset,'' Kaggle, 2019. [En línea]. Disponible en: https://www.kaggle.com/code/phamvudung/imdb-dataset
 \end{thebibliography}
 
 

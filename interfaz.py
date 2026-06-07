@@ -20,10 +20,26 @@ while True:
         if not res:
             print("\nNo se encontraron películas.")
         else:
-            print(f"\nSe encontraron {len(res)} películas:")
-            for doc in documentos:
-                if int(doc['id']) in res:
-                    print(f"- {doc['titulo']} ({doc['genero']}) - Idioma: {doc['idioma']}")
+            coincidentes = [doc for doc in documentos if int(doc['id']) in res]
+            print(f"\nSe encontraron {len(coincidentes)} películas:")
+            for i, doc in enumerate(coincidentes, 1):
+                print(f"{i}. {doc['titulo']} ({doc['genero']}) - Idioma: {doc['idioma']}")
+            
+            while True:
+                op = input("\nSelecciona el número de película para ver detalles (o Enter para volver): ").strip()
+                if op == "":
+                    break
+                if op.isdigit() and 1 <= int(op) <= len(coincidentes):
+                    peli = coincidentes[int(op) - 1]
+                    print("\n" + "-"*50)
+                    print(f"Título: {peli['titulo']}")
+                    print(f"Género: {peli['genero']}")
+                    print(f"Idioma: {peli['idioma']}")
+                    print(f"Sinopsis: {peli['sinopsis']}")
+                    print(f"Reseña de usuarios: {peli['reseña']}")
+                    print("-"*50)
+                else:
+                    print("Opción incorrecta.")
                     
     elif opcion == "2":
         query = input("\nIntroduce los términos de búsqueda (ej: fantasía familiar animación): ")
@@ -31,12 +47,32 @@ while True:
         if not res:
             print("\nNo se encontraron resultados.")
         else:
-            print(f"\nSe encontraron {len(res)} películas (ordenadas por relevancia):")
-            for i, doc_id in enumerate(res, 1):
+            coincidentes = []
+            for doc_id in res:
                 for doc in documentos:
                     if int(doc['id']) == doc_id:
-                        print(f"{i}. {doc['titulo']} ({doc['genero']}) - Idioma: {doc['idioma']}")
+                        coincidentes.append(doc)
                         break
+            
+            print(f"\nSe encontraron {len(coincidentes)} películas (ordenadas por relevancia):")
+            for i, doc in enumerate(coincidentes, 1):
+                print(f"{i}. {doc['titulo']} ({doc['genero']}) - Idioma: {doc['idioma']}")
+            
+            while True:
+                op = input("\nSelecciona el número de película para ver detalles (o Enter para volver): ").strip()
+                if op == "":
+                    break
+                if op.isdigit() and 1 <= int(op) <= len(coincidentes):
+                    peli = coincidentes[int(op) - 1]
+                    print("\n" + "-"*50)
+                    print(f"Título: {peli['titulo']}")
+                    print(f"Género: {peli['genero']}")
+                    print(f"Idioma: {peli['idioma']}")
+                    print(f"Sinopsis: {peli['sinopsis']}")
+                    print(f"Reseña de usuarios: {peli['reseña']}")
+                    print("-"*50)
+                else:
+                    print("Opción incorrecta.")
                         
     elif opcion == "3":
         print("\n¡Hasta pronto!\n")

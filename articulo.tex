@@ -34,7 +34,7 @@
 
 \begin{document}
 
-\title{Título del trabajo (elegir uno original)}
+\title{Buscando la “Joya Oculta”: Comparativa de Sistemas de Recuperación de Información en un Corpus de Películas}
 
 \author{
   \IEEEauthorblockN{Sandra Silva Amaya}
@@ -51,7 +51,7 @@
     \textit{Dpto. Ciencias de la Computación e Inteligencia Artificial}\\
     \textit{Universidad de Sevilla}\\
     Sevilla, España\\
-    Correos electrónicos UVUS y de contacto (si distinto)}
+    nurmarsan@alum.us.es}
 }
 
 \maketitle
@@ -208,8 +208,7 @@ En segundo lugar, se generó el archivo \texttt{consultas.csv} para formalizar c
     \item \textbf{Consulta de Texto Libre:} Una cadena de texto libre desprovista de operadores lógicos (e.g., \texttt{fantasía familiar animación}), que emula la consulta que un usuario escribiría en un buscador moderno. Estas cadenas son procesadas por el motor vectorial basado en TF-IDF y similitud del coseno.
 \end{itemize}
 
-Finalmente, para poder calcular métricas de efectividad de forma cuantitativa, se construyó el archivo \texttt{relevancia.csv}, que constituye la verdad de referencia del sistema. Para cada una de las 20 necesidades de información, las autoras del proyecto realizaron un análisis de las 70 películas que componen el corpus. Durante esta fase, se evaluó si el contenido de cada película (su sinopsis, idioma, reseñas de usuarios y géneros) satisfacía semánticamente la necesidad descrita en la NI. Esta evaluación dio como resultado la anotación de un juicio binario de relevancia (donde 1 indica que el documento es relevante para la necesidad de información dada y 0 que no lo es). Este proceso de etiquetado se rigió por criterios estrictos basados en los metadatos de las obras. Por ejemplo, ante una NI que solicitaba películas en ``español'', un documento solo fue marcado como relevante en \texttt{relevancia.csv} si su idioma oficial era estrictamente ``Español''. Cabe resaltar que esto difiere del comportamiento del algoritmo de búsqueda implementado, dado que los motores indexan un campo de texto combinado (\texttt{contenido}), si una película en inglés contiene el término ``español'' en su sinopsis o reseña (por ejemplo, aludiendo a un personaje o lugar), el algoritmo la recuperará de todos modos. De esta forma, \texttt{relevancia.csv} mantiene una exigencia de veracidad estructural frente a la cual se evalúa la precisión y recall de los modelos.
-
+Finalmente, para poder calcular métricas de efectividad de forma cuantitativa, se construyó el archivo \texttt{relevancia.csv}, que constituye la verdad de referencia del sistema. En lugar de realizar este etiquetado de forma manual, el proceso se automatizó mediante inteligencia artificial utilizando el modelo de lenguaje Gemini de Google~\cite{b6}, el cual evaluó si el contenido de cada una de las 70 películas (su sinopsis, idioma, reseñas de usuarios y géneros) satisfacía semánticamente cada una de las 20 necesidades de información. Esta evaluación dio como resultado la anotación de un juicio binario de relevancia (donde 1 indica que el documento es relevante para la necesidad de información dada y 0 que no lo es). Este proceso de etiquetado se rigió por criterios estrictos basados en los metadatos de las obras. Por ejemplo, ante una NI que solicitaba películas en ``español'', un documento solo fue marcado como relevante en \texttt{relevancia.csv} si su idioma oficial era estrictamente ``Español''. Cabe resaltar que esto difiere del comportamiento del algoritmo de búsqueda implementado, dado que los motores indexan un campo de texto combinado (\texttt{contenido}), si una película en inglés contiene el término ``español'' en su sinopsis o reseña (por ejemplo, aludiendo a un personaje o lugar), el algoritmo la recuperará de todos modos. De esta forma, \texttt{relevancia.csv} mantiene una exigencia de veracidad estructural frente a la cual se evalúa la precisión y recall de los modelos.
 \subsection{Preprocesamiento de Lenguaje Natural}
 Con el fin de optimizar el rendimiento de los motores de búsqueda, el corpus textual se sometió a una fase de preprocesamiento de lenguaje natural (PLN). Esto era necesario pues al tratarse de un conjunto de películas diversas con reseñas escritas por múltiples usuarios, la variabilidad lingüística era muy alta, lo que dificultaría a los modelos de recuperación y perjudicaría la coincidencia de términos.
 
@@ -260,7 +259,7 @@ Para evaluar la efectividad de ambos motores de búsqueda, se confeccionó un ba
     \item \textbf{Colección de Documentos (Corpus):} Un total de 70 películas con información estructurada que integra título, idioma, sinopsis, géneros y reseñas de usuarios. Tras el preprocesamiento (conversión a minúsculas, tokenización, eliminación de caracteres no alfanuméricos, eliminación de palabras vacías en español y reducción a raíces léxicas mediante Snowball), cada película se indexó como un único documento consolidado.
     \item \textbf{Necesidades de Información (NI):} Se definieron manualmente 20 necesidades de información representativas de búsquedas reales de usuarios, abarcando desde filtros temáticos directos (género, idioma) hasta criterios más subjetivos extraídos de las críticas (como ``joya oculta'' u ``obra maestra'').
     \item \textbf{Consultas Formuladas:} Para cada NI, se derivaron dos consultas específicas: una expresión booleana formal (utilizando operadores AND, OR, y NOT) y una consulta en texto libre para el motor vectorial.
-    \item \textbf{Juicios de Relevancia (Verdad de Referencia):} Las autoras evaluaron manualmente cada película frente a las 20 necesidades de información, estableciendo un conjunto binario de relevancia (1 para relevante, 0 para no relevante) para calcular las métricas.
+    \item \textbf{Juicios de Relevancia (Verdad de Referencia):} Se generó un conjunto binario de relevancia (1 para relevante, 0 para no relevante) mediante la asistencia del modelo de lenguaje Gemini de Google~\cite{b6}, el cual evaluó cada una de las 70 películas frente a las 20 necesidades de información para calcular las métricas de efectividad.
 \end{itemize}
 
 Para el sistema booleano, al tratarse de un modelo no posicionado (que devuelve un conjunto desordenado de documentos), se utilizaron las métricas de \textbf{Precisión} y \textbf{Sensibilidad o Recall} promediadas sobre las 20 consultas. Para el sistema vectorial, dado que devuelve una lista ordenada de documentos según su similitud del coseno, se evaluó mediante la \textbf{Precisión Media (Average Precision, AP)} de cada consulta y el \textbf{Promedio de Precisión Media (Mean Average Precision, MAP)} global del sistema.

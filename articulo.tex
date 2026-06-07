@@ -222,6 +222,7 @@ Una vez normalizado el texto, los datos se estructuraron combinando los campos e
 El proceso de construcción del índice se dividió en dos fases principales. En primer lugar, se definió un esquema lógico (\textit{Schema}) para modelar la estructura de cada película. A cada película se le asignó un identificador único (\texttt{ID}) y varios campos de texto (\texttt{TEXT}) para almacenar sus metadatos (título, idioma, sinopsis, reseña y género). Todos estos atributos se configuraron con el parámetro \texttt{stored=True}, lo cual es fundamental para que el sistema no solo busque, sino que pueda recuperar y mostrar esa información al usuario en la interfaz final. Adicionalmente, se introdujo un campo clave denominado \texttt{contenido}, destinado a agrupar la versión preprocesada de los textos y sobre el cual se realizan las búsquedas globales.
 
 En la segunda fase, se configuró un directorio local (\texttt{indexdir}) donde el sistema aloja físicamente el índice invertido. Mediante la apertura de un escritor (\textit{IndexWriter}), se iteró sobre la estructura de datos que contenía el corpus (\textit{DataFrame}), añadiendo secuencialmente cada película como un nuevo documento. Finalmente, se consolidaron los cambios en memoria mediante una operación de \textit{commit}, dejando el índice cerrado,  listo para ser utilizado por los motores de búsqueda.
+
 \subsection{Modelos de Recuperación}
 Para la implementación técnica, el sistema se dividió 
 en dos motores:
@@ -229,6 +230,20 @@ en dos motores:
    \item \textbf{Motor Booleano:} Este sistema evalúa consultas estructuradas por el usuario mediante operadores lógicos (\textit{AND}, \textit{OR} y \textit{NOT}) sobre el índice invertido generado previamente, recuperando únicamente las películas que cumplen de forma estricta con dichas restricciones. El motor está construido con el soporte de la biblioteca \textit{Whoosh}, haciendo uso de su analizador sintáctico (\textit{QueryParser}). Esta herramienta permite interpretar la consulta de manera robusta, gestionando correctamente la jerarquía de los paréntesis y aislando los espacios en blanco para evitar errores de sintaxis. Asimismo, el sistema separa los operadores lógicos y aplica de forma automática la misma canalización de preprocesamiento (conversión a minúsculas, filtrado y \textit{stemming}) a los términos de búsqueda individuales, garantizando así una coincidencia exacta con el vocabulario ya indexado.
    \item \textbf{Motor de Espacio Vectorial:} Este modelo está implementado con la ayuda de \textit{scikit-learn} y funciona siguiendo unos pasos muy directos. Cuando el usuario introduce una consulta, lo primero que hace el sistema es procesar y limpiar ese texto. Después, utiliza la herramienta \textit{TfidfVectorizer} para transformar tanto los textos de las películas como la consulta en vectores. Una vez que tenemos la información convertida a pesos TF-IDF, calculamos la similitud del coseno entre la búsqueda y cada película del corpus. Esto nos devuelve una lista de puntuaciones que ordenamos de mayor a menor para que los resultados más relevantes aparezcan primero. Por último, el código aplica un filtro muy sencillo: solo guarda y devuelve los identificadores de aquellas películas cuya similitud sea estrictamente mayor a 0.00. 
 \end{enumerate}
+
+\subsection{Decisiones de Diseño}
+
+Una de las decisiones arquitectónicas clave en el diseño del esquema de indexación fue el desacoplamiento entre los campos destinados estrictamente a la búsqueda y los campos utilizados para la visualización y almacenamiento de datos. En particular, se optó por indexar por separado los atributos de metadatos (\textit{título}, \textit{idioma}, \textit{género}) y los textos descriptivos (\textit{sinopsis}, \textit{reseña}), configurando el motor de búsqueda para almacenar el contenido original de todos ellos, de forma complementaria al campo combinado \texttt{contenido}.
+
+Esta elección de diseño responde a dos necesidades fundamentales:
+\begin{enumerate}
+    \item \textbf{Eficacia en la Recuperación:} Si las búsquedas o los cálculos de similitud se realizaran directamente sobre los textos originales (sin preprocesar, con alta variabilidad, tildes y mayúsculas), el rendimiento de ambos modelos se vería severamente afectado. Por ello, el campo \texttt{contenido} almacena exclusivamente el texto unificado y normalizado tras pasar por la canalización de preprocesamiento (conversión a minúsculas, filtrado y \textit{stemming}).
+    \item \textbf{Experiencia de Usuario e Interacción:} Cuando un motor de búsqueda recupera un documento, no es viable mostrar al usuario el texto preprocesado del campo \texttt{contenido} (e.g., \textit{``avat espanol explor...''}), ya que resultaría ilegible. Al guardar las versiones originales de la sinopsis, el título o la reseña en el almacenamiento del índice, el sistema puede recuperar de manera instantánea la información legible original una vez identificado el ID de la película coincidente.
+\end{enumerate}
+
+Derivado de esta separación, se ha implementado una mejora interactiva en la interfaz de usuario de consola. Tras realizar una búsqueda (ya sea mediante coincidencia booleana o por similitud de coseno en el modelo vectorial), el sistema presenta al usuario un listado numerado con las películas recuperadas. Aprovechando que la sinopsis y las reseñas se encuentran almacenadas directamente en el índice, el usuario puede seleccionar el número de una película específica para desplegar de forma inmediata su ficha detallada en pantalla (título original, géneros, idioma, sinopsis y reseñas completas). Este diseño evita tener que realizar lecturas recurrentes al archivo físico de la base de datos (\texttt{corpus.csv}) en disco, manteniendo el sistema autocontenido y optimizando los tiempos de respuesta.
+
+Por otra parte, a nivel de ingeniería de software, se optó por estructurar el proyecto mediante una separación de archivos diferenciados según su propósito, dividiéndose en dos cuadernos interactivos y dos módulos en formato script. Los cuadernos, orientados al desarrollo iterativo y la documentación visual, se utilizaron para las tareas que requieren una verificación paso a paso: el primero (\texttt{procesar\_corpus.ipynb}) para la limpieza de los metadatos y la generación del índice, y el segundo (\texttt{evaluar\_sistemas.ipynb}) para la ejecución estadística de la evaluación y la obtención de métricas agregadas. Por el contrario, la lógica central de búsqueda se encapsuló en un archivo de utilidades independientes (\texttt{funciones.py}) para permitir que tanto el cuaderno de evaluación como la interfaz final puedan reutilizar las mismas funciones de búsqueda y preprocesamiento sin duplicidad de código. Finalmente, la interfaz de usuario se implementó en un script independiente (\texttt{interfaz.py}), el cual permite su ejecución rápida y directa desde la terminal del sistema operativo, asegurando una experiencia de uso ágil y desacoplada de la fase de desarrollo.
 
 \section{Resultados}
 
@@ -309,10 +324,6 @@ Al comparar ambos enfoques, se evidencian las ventajas y desventajas de cada par
     \bottomrule
   \end{tabular}
 \end{table*}
-
-
-
-
 
 \section{Conclusiones}
 

@@ -131,34 +131,55 @@ de trabajo futuro.
 
 \section{Preliminares}
 
-En esta sección se hace una breve introducción de las técnicas empleadas y
-también trabajos relacionados, si los hay.
-
+En esta sección se introduce el marco teórico y tecnológico sobre el que se
+asientan los métodos aplicados en el presente estudio, así como una breve 
+revisión de la literatura y trabajos previos directamente relacionados con la 
+materia.
 
 \subsection{Métodos empleados}
 
-Para el tratamiento del lenguaje y la recuperación de información, este trabajo 
-se apoya en los siguientes conceptos teóricos:
+Para lograr el tratamiento automático del texto y permitir la recuperación 
+efectiva de documentos, este trabajo se fundamenta en un conjunto de técnicas
+propias de la disciplina, las cuales abarcan desde la fase previa de limpieza
+del texto hasta los algoritmos subyacentes de emparejamiento.
+
 \begin{itemize}
-    \item \textbf{Procesamiento de Lenguaje Natural (PLN):} Se utilizan técnicas
-     de normalización léxica, destacando la eliminación de palabras vacías
-      (\textit{stop words}) y la reducción morfológica o \textit{stemming}~\cite{b3}.
-    \item \textbf{Modelo Booleano:} Paradigma de recuperación de coincidencia 
-    exacta basado en la teoría de conjuntos y el álgebra de Boole.
-    \item \textbf{Modelo Vectorial (TF-IDF):} Enfoque que representa los 
-    documentos y consultas como vectores en un espacio multidimensional, 
-    ponderando los términos según su frecuencia local y rareza global. La 
-    similitud se evalúa mediante el cálculo del coseno del ángulo que forman 
-    dichos vectores~\cite{b1}.
+    \item \textbf{Procesamiento de Lenguaje Natural (PLN):} Comprende las técnicas de 
+    normalización léxica previas a la indexación. Estas incluyen la tokenización (separación 
+    del texto en unidades mínimas), la eliminación de palabras vacías o \textit{stop words} 
+    (términos funcionales como preposiciones o artículos carentes de significado semántico por 
+    sí solos) y la reducción morfológica o \textit{stemming}~\cite{b3}. El \textit{stemming} 
+    es especialmente relevante en idiomas con alta flexión como el español, ya que reduce las 
+    palabras a su raíz común, minimizando el vocabulario e incrementando la probabilidad de 
+    coincidencia entre la consulta del usuario y el documento.
+    
+    \item \textbf{Modelo Booleano:} Consiste en el paradigma más clásico de recuperación 
+    de información, operando bajo un mecanismo de coincidencia exacta regido por el 
+    álgebra de Boole y la teoría de conjuntos. Las consultas se modelan utilizando operadores 
+    lógicos (\textit{AND}, \textit{OR}, \textit{NOT}) sobre índices invertidos. Su principal 
+    ventaja es el control estricto que ofrece al usuario sobre los resultados, aunque carece 
+    de un sistema de ordenación por relevancia, ofreciendo un conjunto plano de 
+    documentos recuperados~\cite{b1}.
+    
+    \item \textbf{Modelo Vectorial (TF-IDF y Similitud del Coseno):} Se trata de un 
+    enfoque algebraico que representa tanto los documentos como la consulta en 
+    forma de vectores en un espacio de características multidimensional~\cite{b1}. La 
+    ponderación TF-IDF (\textit{Term Frequency - Inverse Document Frequency}) se emplea para 
+    asignar un peso a cada término, valorando positivamente su frecuencia dentro de un documento 
+    (TF) pero penalizándolo si aparece en la mayoría de los documentos del corpus (IDF), de 
+    modo que se destacan los términos verdaderamente discriminatorios. Posteriormente, el cálculo de 
+    la similitud del coseno entre el vector de la consulta y el de cada documento permite determinar 
+    el ángulo que los separa, estableciendo así un nivel de relevancia continuo que facilita el 
+    retorno de un listado ordenado o ranking.
 \end{itemize}
 
 \subsection{Trabajo Relacionado}
 
-En el ámbito de la recuperación de información, es habitual evaluar los 
-sistemas utilizando colecciones de prueba estandarizadas y de dominio público 
-(como los corpus clásicos de Cranfield o TREC). Para 
-abordar el dominio cinematográfico con un vocabulario más actual, en este 
-proyecto se ha optado por construir un entorno de pruebas a medida.
+La evaluación de sistemas de recuperación de información tiene una trayectoria muy consolidada en la literatura. Desde los experimentos clásicos de Cranfield hasta las conferencias TREC (\textit{Text REtrieval Conference}), el estándar metodológico siempre se ha apoyado en la misma idea: medir el rendimiento combinando una colección de documentos, un conjunto de necesidades de información y sus correspondientes juicios de relevancia~\cite{b1}.
+
+Cuando nos centramos en el idioma español, diversos estudios señalan que las búsquedas literales se quedan cortas debido a la rica flexión morfológica del lenguaje. En este escenario, la literatura demuestra que aplicar algoritmos de extracción de raíces, como el \textit{Snowball stemmer}, es una solución clave para agrupar variantes de una misma palabra y mejorar drásticamente la exhaustividad o \textit{recall} del sistema.
+
+Por otro lado, el uso de bases de datos de cine extraídas de Kaggle, como \textit{TMDB} e \textit{IMDB}~\cite{b4,b5}, es un recurso super explotado en nuestro campo. Sin embargo, casi todos los trabajos previos utilizan estos datasets para entrenar sistemas de recomendación (como filtrado colaborativo) o para predecir valoraciones. Lo que diferencia a nuestro proyecto es que cambiamos ese enfoque por completo: tomamos estos datos públicos de Kaggle para centrarnos estrictamente en la recuperación de texto. Esto nos ha permitido diseñar un banco de consultas propio y desafiante, adaptando las metodologías clásicas de evaluación a un vocabulario y un contexto de usuario totalmente actuales.
 
 \section{Metodología}
 

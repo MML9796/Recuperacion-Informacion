@@ -34,7 +34,7 @@
 
 \begin{document}
 
-\title{Buscando la “Joya Oculta”: Comparativa de Sistemas de Recuperación de Información en un Corpus de Películas}
+\title{Buscando la ``Joya Oculta'': Comparativa de Sistemas de Recuperación de Información en un Corpus de Películas}
 
 \author{
   \IEEEauthorblockN{Sandra Silva Amaya}
@@ -246,7 +246,16 @@ Derivado de esta separación, se ha implementado una mejora interactiva en la in
 
 Adicionalmente, se tomó una decisión clave respecto al comportamiento del motor de recuperación basado en el modelo vectorial. Al emplear el cálculo de la similitud del coseno entre las consultas y el corpus, se implementó un filtro de exclusión estricto sobre las puntuaciones obtenidas. El sistema descarta automáticamente y no muestra aquellas películas cuya similitud con la consulta sea exactamente igual a $0.00$. El propósito de esta medida es evitar la presentación de resultados nulos al usuario, garantizando así que los documentos devueltos en el ranking contengan, como mínimo, alguna coincidencia real con los términos de búsqueda solicitados.
 
-Por otra parte, a nivel de ingeniería de software, se optó por estructurar el proyecto mediante una separación de archivos diferenciados según su propósito, dividiéndose en dos cuadernos interactivos y dos módulos en formato script. Los cuadernos, orientados al desarrollo iterativo y la documentación visual, se utilizaron para las tareas que requieren una verificación paso a paso: el primero (\texttt{procesar\_corpus.ipynb}) para la limpieza de los metadatos y la generación del índice, y el segundo (\texttt{evaluar\_sistemas.ipynb}) para la ejecución estadística de la evaluación y la obtención de métricas agregadas. Por el contrario, la lógica central de búsqueda se encapsuló en un archivo de utilidades independientes (\texttt{funciones.py}) para permitir que tanto el cuaderno de evaluación como la interfaz final puedan reutilizar las mismas funciones de búsqueda y preprocesamiento sin duplicidad de código. Finalmente, la interfaz de usuario se implementó en un script independiente (\texttt{interfaz.py}), el cual permite su ejecución rápida y directa desde la terminal del sistema operativo, asegurando una experiencia de uso ágil y desacoplada de la fase de desarrollo.
+Por otra parte, a nivel de ingeniería de software, se optó por estructurar el proyecto mediante una separación de archivos diferenciados según su propósito, dividiéndose en dos cuadernos interactivos y dos módulos en formato script. Los cuadernos, orientados al desarrollo iterativo y la documentación visual, se utilizaron para las tareas que requieren una verificación paso a paso: el primero (\texttt{procesar\_corpus.ipynb}) para la limpieza de los metadatos y la generación del índice, y el segundo (\texttt{evaluar\_sistemas.ipynb}) para la ejecución estadística de la evaluación y la obtención de métricas agregadas. Por el contrario, la lógica de preprocesamiento y búsqueda se encapsuló en un módulo de utilidades independiente (\texttt{funciones.py}) para permitir que tanto ambos cuadernos de trabajo como la interfaz final reutilicen las mismas funciones sin duplicidad de código, garantizando la consistencia total en el tratamiento del texto. Finalmente, la interfaz de usuario se implementó en un script independiente (\texttt{interfaz.py}), el cual permite su ejecución rápida y directa desde la terminal del sistema operativo, asegurando una experiencia de uso ágil y desacoplada de la fase de desarrollo.
+
+\subsection{Uso de Inteligencia Artificial Generativa}
+
+Siguiendo las directrices de la asignatura, el uso de sistemas de inteligencia artificial generativa se limitó a tareas de asistencia en el procesamiento de datos y etiquetado de relevancia, utilizando el modelo de lenguaje Gemini desarrollado por Google~\cite{b6}. A continuación se describen los propósitos y las entradas (\textit{prompts}) empleadas en cada caso:
+
+\begin{itemize}
+    \item \textbf{Traducción y Unificación del Corpus:} Para traducir las sinopsis y reseñas cinematográficas del inglés al español, se proporcionó al modelo un \textit{prompt} estructurado donde se definía su rol como traductor profesional. Se le instruyó para mantener un tono natural, respetar nombres propios y marcas temporales, y devolver exclusivamente el texto traducido limpio de metadatos adicionales.
+    \item \textbf{Generación de Juicios de Relevancia:} Para construir el archivo de verdad de referencia (\texttt{relevancia.csv}), se diseñó un \textit{prompt} que incluía la descripción detallada de una necesidad de información (NI) y la ficha técnica de una película. Se solicitó al modelo analizar semánticamente el documento y responder con un valor binario ($1$ para relevante y $0$ para no relevante), acompañado de una breve justificación de su lógica para validar la coherencia conceptual del etiquetado.
+\end{itemize}
 
 \section{Resultados}
 

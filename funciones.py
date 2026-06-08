@@ -14,7 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 nltk.download('punkt_tab', quiet=True)
 nltk.download('stopwords', quiet=True)
 
-# Configurar para español
+#Funciones de Preprocesamiento 
 stop_words = set(stopwords.words('spanish'))
 stemmer = SnowballStemmer('spanish')
 
@@ -31,7 +31,6 @@ def aplica_stemmer(tokens):
 
 def procesar_texto(texto):
     texto = texto.lower()
-    # Tokenizar
     tokens = word_tokenize(texto)
     tokens = elimina_no_alfanumerico(tokens)
     tokens = elimina_stopwords(tokens)
@@ -39,12 +38,8 @@ def procesar_texto(texto):
     
     return " ".join(tokens)
 
+#Modelo Booleano
 def procesar_query_booleana(query_str):
-    """
-    Procesa la consulta manteniendo los operadores lógicos booleanos intactos,
-    pero aplicando el stemmer y eliminación de stopwords a los términos de búsqueda.
-    """
-    # Separar paréntesis para tratarlos como tokens independientes
     query_str = query_str.replace('(', ' ( ').replace(')', ' ) ')
     tokens = query_str.split()
     
@@ -66,11 +61,12 @@ def obtener_resultados_booleanos(query_str, index_dir="indexdir"):
     with ix.searcher() as searcher:
         parser = qparser.QueryParser("contenido", ix.schema)
         query = parser.parse(query_procesada)
-        results = searcher.search(query, limit=None) # limit=None para devolver todos
+        results = searcher.search(query, limit=None)
         for r in results:
             retrieved_ids.add(int(r['id']))
     return retrieved_ids
 
+#Modelo Vectorial
 def obtener_resultados_coseno(query_str, documentos):
     query_procesada = procesar_texto(query_str)
     textos = [doc['contenido'] for doc in documentos]
